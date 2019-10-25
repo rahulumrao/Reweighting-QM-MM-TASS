@@ -274,7 +274,7 @@ INTEGER :: ii,jj,u,m,i_md,i_mtd,t_min,t_max,index1,md_steps,i_s1,i_s2,ncv,nbin(*
 REAL*8  :: dum,den,s1,s2,kt
 REAL*8  :: prob_2D(nbin(u),nbin(m)),gridmin(*),gridmax(*),griddif(*),cv(ncv,*),vbias(*),ct(*)
 
-IF (ii .eq. u .and. jj .eq. m ) THEN
+!IF (ii .eq. u .and. jj .eq. m ) THEN
 DO i_md=1,md_steps
     IF((i_md.GT.t_min).AND.(i_md.LT.t_max))THEN
      indx(u) = nint((cv(u,i_md)-gridmin(u))/griddif(u)) + 1
@@ -306,7 +306,7 @@ DO i_s1 = 1,nbin(u)
     WRITE(2,*)
 END DO
 WRITE(*,'(A)')'Unbiased 2D distribution along US vs MTD  written in Pu_2D.dat'
-ENDIF 
+!ENDIF 
 CLOSE(2) 
 END SUBROUTINE
 !=================================================== US vs TEMP Probability ================================================!
