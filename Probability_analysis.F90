@@ -293,7 +293,7 @@ STOP ; ENDIF
          den = den + dum
     END IF
 END DO
-PRINT*,i_mtd
+!PRINT*,i_mtd
 dum = den*griddif(u)*griddif(m) ;  den = 1.D0/dum
 OPEN(2,FILE='Pu_2D.dat',STATUS='unknown')
 DO i_s1 = 1,nbin(u)
