@@ -1,0 +1,127 @@
+#!/bin/bash
+
+#:%s/^[ ]\+/\t/g [TO REPLACE SPACE WITH TAB IN vim]
+
+#Help
+Info () {
+
+cat<<EOD
+
+---------------------------------------------------------------------------------------------------------------------!
+!FORTRAN PROGRAM WRITTEN TO COMPUTE UNBIASED DISTRIBUTION (1D AND 2D)FROM TASS SIMULATION ALONG USER DEFINED          !
+!COLLECTIVE COORDINATES..                                                                                             !
+!ORIGINAL CODE WRITTEN BY Shalini Awasthi (ashalini@iitk.ac.in)                                                       !
+!MODIFIED BY Rahul Verma (vrahul@iitk.ac.in)                                                                          !
+!                                                                                                                     !
+!kt = System Temeprature ; kt0 = Extended CV Temperature ; bias_fact = Biased Factor for MTD ; ct = ct Factor         !
+!t_min = Minimum MD steps ; t_max = Maximum MD steps ; narg = Argumets ; ncv = Numer of CV ; v_baias = Total MTD bias !
+!cv_mtd = m = MTD CV index ; u_cv = u = Umbrella CV index ; t_cv = t = Temeprature CV index                           !
+!UCV = U cv argument ; MTD = MTD cv argument ; Prob_nD = Dimension of Unbiased Probability                            !
+!CV_num = Probability is the Dimension of ; pfrqMD = Print Frequency argument ; w_cv Print Frequency in cvmdck File   !
+!dtMTD  = Print Frequency argument for MTD bias added ; w_hill = Print Frequency in colvar File                       !
+!gridmin = Minimum Grid Size = gridmax = Maximum Grid Size ; griddif = Grid Difference                                !
+!width = Hill Width of Gaussian Bias in MTD ; ht = Hill Height of Gaussian Bias in MTD ; ht = MTD CV Displacement     !
+!kb = Boltzman Constant in A.U. ; prob = 1D Probability ; prob_2D = 2D Probability                                    !
+!---------------------------------------------------------------------------------------------------------------------!
+
+EOD
+
+exit 0;
+}
+
+#Help
+Help () {
+
+cat<<EOD
+
+Usage: ./configure [flags] compiler
+
+    where compiler is one of: [[ gnu, intel ]]
+
+                              COMPILERS
+                 -----------------------------------
+    Compiler Set |     C     |    C++    | Fortran 
+    ------------------------------------------------
+      gnu        |    gcc    |   g++     | gfortran
+      intel      |    icc    |   icpc    | ifort
+
+    Flags (Optional):
+      -openmp        Use OpenMP pragmas to parallelize soeme of the loops .
+===============================================================================
+
+EOD
+
+exit 0;
+}
+
+
+#Is it help option or debug option
+info=0 ; i=1
+
+while [ $i -le $# ];
+do
+  #Select the i-th argument
+  eval option=\$$i
+  case $option in
+    -help|-h)
+      Help
+      exit 0
+      ;;
+    -info|-i)
+      Info
+      ;;
+  esac
+  i=`expr $i + 1`
+done
+os=`uname -s`
+echo 
+echo "Found $os Operating System"
+compiler=''
+echo "PLEASE SPECIFY THE COMPILER [gnu/intel]" 
+read compiler
+
+case $os in
+
+    Linux)
+#gfortran
+
+echo '#Makefile' > makefile
+echo >> makefile
+
+echo '.RECIPEPREFIX+=' >> makefile
+echo >> makefile
+
+echo 'Probability_analysis.x  : GetSteps.o MTD_Unbais.o MTD_Potential.o US_Prob.o US_MTD.o US_TEMP.o' >> makefile
+           if [ "$compiler" = "gnu" ]
+           then
+echo '    gfortran -o Probability_analysis.x Main.F90 GetSteps.o MTD_Unbais.o MTD_Potential.o US_Prob.o US_MTD.o US_TEMP.o' >> makefile
+fi
+           if [ "$compiler" = "intel" ]
+           then
+echo '    ifort -o Probability_analysis.x Main.F90 GetSteps.o MTD_Unbais.o MTD_Potential.o US_Prob.o US_MTD.o US_TEMP.o' >> makefile
+fi
+
+echo >> makefile
+echo 'GetSteps.o  :   GetSteps.F90' >>  makefile
+echo '    gfortran -c GetSteps.F90' >> makefile
+echo >> makefile
+echo 'MTD_Unbais.o    :   MTD_Unbais.F90' >> makefile
+echo '    gfortran -c MTD_Unbais.F90' >> makefile
+echo >> makefile
+echo 'MTD_Potential.o :   MTD_Potential.F90' >> makefile
+echo '    gfortran -c MTD_Potential.F90' >> makefile
+echo >> makefile
+echo 'US_Prob.o   :   US_Prob.F90' >> makefile
+echo '    gfortran -c US_Prob.F90' >> makefile
+echo >> makefile
+echo 'US_MTD.o    :   US_MTD.F90' >> makefile
+echo '    gfortran -c US_MTD.F90' >> makefile
+echo >> makefile
+echo 'US_TEMP.o   :   US_TEMP.F90' >> makefile
+echo '    gfortran -c US_TEMP.F90' >> makefile
+echo >> makefile
+echo 'clean   :' >> makefile
+echo '    rm *.o Probability_analysis.x' >> makefile
+
+
+esac
